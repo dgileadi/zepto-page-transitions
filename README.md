@@ -38,8 +38,6 @@ The second page (simple2.html):
 
 Notice that simple2.html doesn't have any links to stylesheets or Javascript files.  That's because the head content is thrown away anyway when the page is loaded.  If you want to run scripts or include styles specific to simple2.html then just reference them within its `<body>` tag.
 
-[Try the above example](example/simple.html)
-
 ##More Detail##
 
 This transition plugin is largely modeled after the JQuery Mobile plugin's design, although it's written from scratch and thus may have its own quirks and bugs not shared by JQuery Mobile.  Here are some features that it shares with JQuery Mobile:
