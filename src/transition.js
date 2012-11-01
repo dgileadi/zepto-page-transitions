@@ -43,11 +43,11 @@ $(document).ready(function() {
 
 			settings = $.extend( {
 				defaultPageTransition : 'fade',
-				cachePages : false
+				domCache : false
 			}, options);
 		},
 
-		init : function(eventData, targetPage) {
+		init : function(eventData, targetPage, title) {
 
 			// one-time initialization
 			if (!inited) {
@@ -111,9 +111,13 @@ $(document).ready(function() {
 				$(this).css('zIndex', zIndex++);
 			});
 
-			$('a[href]', pages).not('[target]').not('[rel="external"]').not('[data-href]').transition('hijackLinks');
+			$('a[href]', pages).not('[target]').not('[rel="external"]').not('[data-ajax="false"]').not('[data-href]').transition('hijackLinks');
 			$('[data-href]', pages).transition('hijackLinks');
 			$('form').not('[target]').not('[data-ajax="false"]').transition('hijackLinks');
+
+			if (!title)
+				title = document.title;
+			pages.not('[data-title]').data('title', title);
 
 			pages.hide();
 			var active = targetPage ? $(targetPage) : null;
@@ -129,6 +133,17 @@ $(document).ready(function() {
 
 			return this.each(function() {
 				var el = $(this);
+
+				if (el.data('rel') == 'back') {
+					var handler = function(e) {
+						window.history.back();
+						e.preventDefault();
+					};
+					el.on('click', handler);
+					el.on('tap', handler);
+					return;
+				}
+
 				var href = el.attr('data-href') || el.attr('href') || el.attr('action') || "#";
 				if (href.charAt(0) === '#') {
 					// ignore some hash links; this is buggy when navigating backwards
@@ -175,6 +190,16 @@ $(document).ready(function() {
 
 		changePage : function(to, back) {
 
+			var changeEventData = { toPage: to, back: back };
+			var e = $.Event('pagebeforechange');
+			$(this).trigger(e, changeEventData);
+			if (e.defaultPrevented)
+				return;
+			else {
+				to = changeEventData.toPage;
+				back = changeEventData.back;
+			}
+
 			var transition = null;
 			if (back && history.length)
 				transition = history.pop().transition;
@@ -196,9 +221,9 @@ $(document).ready(function() {
 			if ((typeof to === 'string') && to.charAt(0) === '#') {
 				var toPage = $(toId(to));
 				if (toPage.length) {
-					$(document.body).transition('perform', from, toPage, transition, back);
+					$(this).transition('perform', from, toPage, transition, back, changeEventData);
 					handled = true;
-				} else if (!settings.cachePages && sourcePages[to]) {
+				} else if (!settings.domCache && sourcePages[to]) {
 					targetPage = to;
 					to = sourcePages[to];
 				} else
@@ -209,21 +234,23 @@ $(document).ready(function() {
 				var eventData = {href: href, element: $(this), back: back};
 				var e = $.Event('pagebeforeload');
 				$(this).trigger(e, eventData);
+				var el = $(this);
 				if (!e.defaultPrevented) {
-					$(this).transition('load', to, eventData, function(result) {
+					$(this).transition('load', to, eventData, function(body, result, title) {
 						// add it to the current document
 						var div = $('<div />');
-						div.html(result);
+						div.html(body);
 						$(document.body).append(div);
 
-						var to = $(div).transition('init', eventData, targetPage);
-						$(document.body).transition('perform', from, to, transition, back);
+						var to = $(div).transition('init', eventData, targetPage, title);
+						$(el).transition('perform', from, to, transition, back, changeEventData);
 					});
 					handled = true;
 				}
 			}
 
-			return !handled;
+			if (!handled)
+				$(this).trigger('pagechangefailed', changeEventData);
 		},
 
 		load : function(what, eventData, onSuccess) {
@@ -238,17 +265,23 @@ $(document).ready(function() {
 				lastLoaded = what.url;
 
 				// mark everything not just loaded as disposable
-				if (!settings.cachePages)
-					$('div[data-role="page"]').addClass('transition-recyclable');
+				if (!settings.domCache)
+					$('div[data-role="page"]').not('[data-dom-cache="true"]').addClass('transition-recyclable');
 
-				// extract the body from the html
+				// extract the body and title from the html
 				var bodyStart = result.search(/<body/i);
+				var head = result;
 				var body = result;
+				var title;
 				if (bodyStart != -1) {
+					head = result.slice(0, bodyStart);
 					bodyStart = result.indexOf('>', bodyStart);
 					bodyEnd = result.search(/<\/body>/i);
 					body = result.slice(bodyStart + 1, bodyEnd);
 				}
+				var match = head.match(/<title>(.+)<\/title>/im);
+				if (match)
+					title = match[1];
 
 				// adjust relative links
 				if (window.location.hash) {
@@ -267,18 +300,19 @@ $(document).ready(function() {
 					}
 				}
 
-				onSuccess(body, result);
+				onSuccess(body, result, title);
 			};
 			what.error = function(xhr, textStatus, errorThrown) {
 				eventData.xhr = xhr;
 				eventData.textStatus = textStatus;
 				eventData.errorThrown = errorThrown;
-				$(document.body).trigger('pageloadfailed', eventData);
+				$(this).trigger('pageloadfailed', eventData);
+				$(this).trigger('pagechangefailed', {toPage: what.url});
 			};
 			$.ajax(what);
 		},
 
-		perform : function(from, to, transition, back) {
+		perform : function(from, to, transition, back, changeEventData) {
 
 			from.trigger('pagebeforehide', from);
 			to.trigger('pagebeforeshow', to);
@@ -303,14 +337,20 @@ $(document).ready(function() {
 				from.removeClass('reverse');
 				to.removeClass('reverse');
 
+				var title = to.data('title');
+				if (title)
+					document.title = title;
+
 				from.trigger('pagehide', from);
 				to.trigger('pageshow', to);
+
+				$(this).trigger('pagechange', changeEventData);
 
 				$('div[data-role="page"]').hide();
 				to.show();
 
 				// recycle all recyclable pages and empty divs
-				if (!settings.cachePages) {
+				if (!settings.domCache) {
 					$('div.transition-recyclable').each(function() {
 						var e = $.Event('pageremove');
 						$(this).trigger(e, $(this));
