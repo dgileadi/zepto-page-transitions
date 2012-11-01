@@ -1,0 +1,18 @@
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="../min/transition.min.css" />
+        <script type="text/javascript" src="zepto.min.js"></script>
+        <script type="text/javascript" src="../min/transition.min.js"></script>
+        <title>Page One</title>
+    </head>
+    <body>
+        <div id="one" data-role="page">
+            <h1>You're Starting On Page One</h1>
+            <a transition="spin" href="#two">Spin to local page two</a>
+        </div>
+        <div id="two" data-role="page" data-title="Page Two">
+            <h1>You Reached Page Two, Without Loading Any Data</h1>
+            <a transition="slide" href="multi-page2.html">Slide to load page three</a>
+        </div>
+    </body>
+</html>
