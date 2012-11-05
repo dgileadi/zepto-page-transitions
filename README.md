@@ -36,7 +36,7 @@ Note the `transition="flip"` attribute.  You could also have used `data-transiti
 	    </body>
 	</html>
 
-Notice that simple2.html doesn't have any links to stylesheets or Javascript files.  That's because the head content is thrown away when the page is loaded.  If you want to run scripts or include styles specific to simple2.html then just include them within its `<body>` tag.
+Notice that simple2.html doesn't have any links to stylesheets or Javascript files.  That's because the head content is thrown away when the page is loaded via AJAX.  If you want to run scripts or include styles specific to simple2.html then just include them within its `<body>` tag.
 
 Also see the multi-page example for including multiple pages in a single HTML file.
 
