@@ -371,7 +371,7 @@ $(document).ready(function() {
 		else if (typeof method === 'object' || !method)
 		  return methods.init.apply(this, arguments);
 		else
-		  $.error('Method ' +  method + ' does not exist');
+		  throw 'Method ' +  method + ' does not exist';
 	};
 
 	function toId(url) {
