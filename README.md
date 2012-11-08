@@ -3,11 +3,11 @@ Zepto plugin for Animated CSS Page Transitions
 
 This HTML5 CSS Page Transitions plugin for [Zepto.js](http://zeptojs.com) is similar to [JQuery Mobile page transitions](http://jquerymobile.com/demos/1.2.0/docs/pages/page-navmodel.html), but is standalone, i.e. without all the other widgets and functionality that JQuery Mobile provides.  Consequently it is much smaller, at around 13k.
 
-##What It Does##
+## What It Does ##
 
 In order to support animated transitions between pages the plugin has to hijack regular browser navigation.  When you click a link or submit a form the plugin makes an AJAX request to load the new page.  It places the body of the loaded page into a new div, and then uses HTML5 CSS transitions to smoothly switch between the two pages.
 
-##Example##
+## Example ##
 
 The above may sound a little complicated, but using the plugin is quite simple.  Just include zepto.js and the CSS and JS file from this plugin in your main page (we'll call it simple.html):
 
@@ -40,7 +40,7 @@ Notice that simple2.html doesn't have any links to stylesheets or Javascript fil
 
 Also see the multi-page example for including multiple pages in a single HTML file.
 
-##Transitions##
+## Transitions ##
 
 This plugin includes the following CSS transitions, found in transition.css:
 
@@ -54,7 +54,7 @@ This plugin includes the following CSS transitions, found in transition.css:
 
 You can create your own CSS transitions in your own CSS file.  Just reference them using the `transition="mycustomtransition"` or `data-transition="mycustomtransition"` attribute.
 
-##Customizing##
+## Usage ##
 
 Any link can have a `transition` and/or `direction="reverse"` attribute (each of these can also be prefixed by `data-`).  Forms may also have these attributes.  Other elements like buttons can also trigger page transitions and have the above attributes; just add a `data-href` attribute to them.  Use the `data-rel="back"` attribute to navigate backwards using the browser history; any associated transitions will play in reverse.
 
@@ -78,7 +78,7 @@ To set the `defaultPageTransition` and/or `domCache` customization options you c
 
 The default for `defaultPageTransition` is `"fade"` and the default for `domCache` is `false`.
 
-##Events##
+## Events ##
 
 This plugin shares many events with [JQuery Mobile](http://jquerymobile.com/demos/1.2.0/docs/api/events.html), although the data passed to the callback function is often different.  The events it supports are:
 
@@ -95,7 +95,7 @@ This plugin shares many events with [JQuery Mobile](http://jquerymobile.com/demo
 * `pageinit`: called when a page is fully initialized, but before it is shown.  This event may not be prevented.
 * `pageremove`: called before a page is removed from the DOM, which can happen when a new HTML file is loaded and the page is not being cached.  The data object passed as the second argument to the callback function is the page that will be removed.  This event may be prevented by the callback.
 
-##Features##
+## Features ##
 
 This transition plugin is largely modeled after the JQuery Mobile plugin's design, although it's written from scratch and thus may have its own quirks and bugs not shared by JQuery Mobile.  Here are some features that it shares with JQuery Mobile:
 
@@ -128,7 +128,7 @@ Features that JQuery Mobile provides that this plugin doesn't:
 * Large file size :)
 * Likely others I missed.
 
-##Q & A##
+## Q & A ##
 
 1. Why not use [insert your favorite plugin here] instead?
 	* It didn't fit my needs (lightweight, uses Zepto.js, decent amount of features).
