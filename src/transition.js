@@ -284,21 +284,7 @@ $(document).ready(function() {
 					title = match[1];
 
 				// adjust relative links
-				if (window.location.hash) {
-					var slashIndex = window.location.hash.lastIndexOf('/');
-					if (slashIndex != -1) {
-						var relative = window.location.hash.slice(1, slashIndex + 1);
-						body = body.replace(/(\b(src|href|action))="([^"#:]+)"/gi, '$1="' + relative + '$3"');
-
-						// fix replaced links in the form of "relative/../"
-						do {
-							slashIndex = relative.lastIndexOf('/', slashIndex - 2) + 1;
-							var pattern = '(\\b(src|href|action))="' + relative.slice(slashIndex) + '\.\./';
-							relative = relative.slice(0, slashIndex);
-							body = body.replace(new RegExp(pattern, 'gi'), '$1="');
-						} while (slashIndex > 0);
-					}
-				}
+				body = fixLinks(body);
 
 				onSuccess(body, result, title);
 			};
@@ -374,8 +360,51 @@ $(document).ready(function() {
 		  throw 'Method ' +  method + ' does not exist';
 	};
 
-	function toId(url) {
-		return url.replace(/[:\.\+\/]/g, '_');
+	function toId(url) { return url.replace(/[:\.\+\/]/g, '_'); }
+
+	function fixLinks(body) {
+
+		if (window.location.hash) {
+			var relative = relativePath(window.location.pathname, window.location.hash.slice(1));
+			if (relative.length)
+				body = body.replace(/(\b(src|href|action))="([^"#:]+)"/gi, '$1="' + relative + '$3"');
+		}
+		return body;
+	}
+
+	function relativePath(fromPath, toPath) {
+
+		var relative = '';
+
+		var slashIndex = toPath.lastIndexOf('/');
+		if (slashIndex != -1) {
+			relative = toPath.slice(0, slashIndex + 1);
+			if (relative.charAt(0) == '/') {
+				// strip the common start of paths
+				if (!fromPath.charAt(0) == '/')
+					fromPath = '/' + fromPath;
+				var start = 1;
+				slashIndex = start;
+				do {
+					slashIndex = relative.indexOf('/', slashIndex) + 1;
+					if (slashIndex > start && relative.slice(0, slashIndex) == fromPath.slice(0, slashIndex))
+						start = slashIndex;
+				} while (slashIndex > 0 && slashIndex == start);
+
+				// make a relative path between them
+				var back = '';
+				slashIndex = start;
+				do {
+					slashIndex = fromPath.indexOf('/', slashIndex + 1);
+					if (slashIndex != -1)
+						back += '../';
+				} while (slashIndex != -1);
+
+				relative = back + relative.slice(start);
+			}
+		}
+
+		return relative;
 	}
 
 })( Zepto );
