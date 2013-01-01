@@ -366,8 +366,12 @@ $(document).ready(function() {
 
 		if (window.location.hash) {
 			var relative = relativePath(window.location.pathname, window.location.hash.slice(1));
-			if (relative.length)
+			if (relative.length) {
 				body = body.replace(/(\b(src|href|action))="([^"#:]+)"/gi, '$1="' + relative + '$3"');
+
+				// fix replaced links in the form of "relative/../"
+				body = body.replace(/(\b(src|href|action))="(.+\/)?[^\/]+\/\.\.\//gi, '$1="$3');
+			}
 		}
 		return body;
 	}
