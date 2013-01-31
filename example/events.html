@@ -1,0 +1,39 @@
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="../min/transition.min.css" />
+        <script type="text/javascript" src="zepto.min.js"></script>
+        <script type="text/javascript">
+$(document).ready(function() {
+
+    // Note that we include this script before including transition.min.js
+    // in order to catch the initial pageinit event
+
+    var log = function(e, eventData) {
+        if (eventData)
+            console.log(e.type, eventData);
+        else
+            console.log(e.type);
+    };
+    $(document).on('pageload', log);
+    $(document).on('pageinit', log);
+    $(document).on('pagebeforechange', log);
+    $(document).on('pagebeforeload', log);
+    $(document).on('pagechangefailed', log);
+    $(document).on('pageloadfailed', log);
+    $(document).on('pagebeforehide', log);
+    $(document).on('pagebeforeshow', log);
+    $(document).on('pagehide', log);
+    $(document).on('pageshow', log);
+    $(document).on('pagechange', log);
+    $(document).on('pageremove', log);
+});
+        </script>
+        <script type="text/javascript" src="../min/transition.min.js"></script>
+        <title>Page One</title>
+    </head>
+    <body>
+        <h1>You're Starting On Page One</h1>
+        <p><em>Events will be logged to your javascript console.</em></p>
+        <a transition="flip" href="simple2.html">Flip to page two</a>
+    </body>
+</html>

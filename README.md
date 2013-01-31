@@ -60,6 +60,12 @@ Any link can have a `transition` and/or `direction="reverse"` attribute (each of
 
 Any link that has a `rel="external"` attribute will be excluded from using page transitions.  Likewise any link or form that has a `data-ajax="false"` or a `target` attribute will also be excluded.
 
+You can load pages programmatically, as demonstrated in the programmatic example:
+
+	$(document).transition('to', relativeUrl, transition, reverse);
+
+The `'to'`, `transition` and `reverse` arguments are optional.
+
 To put several pages into one HTML file simply place each one inside its own `<div data-role="page">` tag.  To link to a page within the file first give each div its own `id` attribute, and then in the link use `href="#pageid"`, where pageid is the value of a page's id attribute.  Note that page id's should be unique across your site, not just within a single HTML file.
 
 When you link to an HTML file containing multiple pages the first page is displayed.  Its `id` is also replaced by the name of the HTML file (along with any links to that id).
@@ -68,9 +74,9 @@ When you load a new page the browser's title is replaced with that page's title.
 
 You can link to HTML files that are not in the same level as the original HTML file, e.g. `href="path/with/slashes.html"`.  However this support is provided by replacing links in the loaded HTML and consequently may be slow and incomplete.  Avoid using multiple levels of pages when possible.
 
-Because pages are loaded using AJAX you can't use the regular `$(document).ready()` function that you may be used to.  Instead bind to the `pageinit` event, which will be triggered for each loaded page.
+Because this plugin loads pages using AJAX you can't use the regular `$(document).ready()` function that you may be used to for any page except the first.  Instead bind to the `pageinit` event, which will be triggered for each loaded page.  If you want to catch the `pageinit` event for the initial page, register your listener in a script tag that comes before including transition.js.  You can see this in the events example.
 
-As mentioned in the example, head content is thrown away when an HTML file is loaded.  If you want to run scripts or include styles specific to a HTML file then include them within its `<body>` tag.  Put all shared scripts and styles into the original HTML file's head content.
+As mentioned in the example above, head content is thrown away when an HTML file is loaded.  If you want to run scripts or include styles specific to a HTML file then include them within its `<body>` tag.  Put all shared scripts and styles into the original HTML file's head content.
 
 To set the `defaultPageTransition` and/or `domCache` customization options you can use code like the following:
 

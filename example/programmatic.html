@@ -1,0 +1,34 @@
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="../min/transition.min.css" />
+        <script type="text/javascript" src="zepto.min.js"></script>
+        <script type="text/javascript">
+
+// put this script before the transition include so the pageinit event fires
+
+$(document).on('pageinit', function() {
+    $('#go').on('click', function(e) {
+        $(document).transition('to', 'simple2.html', $('#effect').val());
+        e.preventDefault();
+    });
+});
+        </script>
+        <script type="text/javascript" src="../min/transition.min.js"></script>
+        <title>Page One</title>
+    </head>
+    <body>
+        <h1>You're Starting On Page One</h1>
+        <form>
+            <select id="effect">
+                <option value="spin">spin</option>
+				<option value="slide">slide</option>
+				<option value="slideup">slideup</option>
+				<option value="slidedown">slidedown</option>
+				<option value="fade">fade</option>
+				<option value="flip">flip</option>
+				<option value="pop">pop</option>
+            </select>
+            <button id="go">To Page Two</button>
+        </form>
+    </body>
+</html>

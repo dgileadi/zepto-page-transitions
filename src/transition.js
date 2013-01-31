@@ -22,7 +22,7 @@
 
 $(document).ready(function() {
 
-	$(document.body).transition().show();
+	$(document.body).transition('init').show();
 });
 
 (function( $ ) {
@@ -33,7 +33,8 @@ $(document).ready(function() {
 		settings			= null,
 		sourcePages			= {},
 		lastLoaded			= window.location.href,
-		element				= null,
+		action				= null,
+		transition			= null,
 		ignoreHash			= {},
 		history				= [];
 
@@ -56,21 +57,36 @@ $(document).ready(function() {
 				$(document.body).transition('options', {});
 
 				$(window).on('hashchange', function(e) {
-					var target = element || $(document.body);
+					var target = (action && action.element) || $(document.body);
 					if (!ignoreHash[window.location.hash]) {
 						var to = window.location.hash;
-						if (element && element.is('form')) {
+						if (action && action.element && action.element.is('form')) {
 							to = {
-								type: element.attr('method') || 'get',
+								type: action.element.attr('method') || 'get',
 								url: window.location.hash.slice(1),
-								data: element.serialize(),
+								data: action.element.serialize(),
 								dataType: 'html',
 								global: false
 							};
 						}
-						target.transition('changePage', to, element == null);
+						var transition = null;
+						var back = action == null;
+						if (back)
+							transition = history.length ? history.pop().transition : settings.defaultPageTransition;
+						else if (action.transition) {
+							transition = action.transition;
+							history.push({href: window.location.pathname, transition: transition});
+							back = action.reverse;
+						} else {
+							transition = action.element.attr('transition') || action.element.data('transition') || settings.defaultPageTransition;
+							history.push({href: window.location.pathname, transition: transition});
+							var direction = action.element.attr('direction') || action.element.data('direction');
+							if (direction === 'reverse')
+								back = true;
+						}
+						target.transition('changePage', to, transition, back);
 					}
-					element = null;
+					action = null;
 				});
 			}
 
@@ -129,6 +145,15 @@ $(document).ready(function() {
 			return active;
 		},
 
+		to : function(page, transition, reverse) {
+
+			transition = transition || settings.defaultPageTransition;
+			if (!reverse)
+				reverse = false;
+			action = {transition: transition, reverse: reverse};
+			window.location.hash = '#' + page;
+		},
+
 		hijackLinks : function() {
 
 			return this.each(function() {
@@ -165,18 +190,18 @@ $(document).ready(function() {
 				var handler;
 				if (el.is('a')) {
 					handler = function(e) {
-						element = el;
+						action = {element: el};
 					};
 				} else if (el.is('form')) {
 					handler = function(e) {
-						element = el;
+						action = {element: el};
 						window.location.href = href;
 						e.preventDefault();
 					}
 					el.on('submit', handler);
 				} else {
 					handler = function(e) {
-						element = el;
+						action = {element: el};
 						window.location.href = href;
 					}
 				}
@@ -188,7 +213,7 @@ $(document).ready(function() {
 			});
 		},
 
-		changePage : function(to, back) {
+		changePage : function(to, transition, back) {
 
 			var changeEventData = { toPage: to, back: back };
 			var e = $.Event('pagebeforechange');
@@ -198,19 +223,6 @@ $(document).ready(function() {
 			else {
 				to = changeEventData.toPage;
 				back = changeEventData.back;
-			}
-
-			var transition = null;
-			if (back && history.length)
-				transition = history.pop().transition;
-			else {
-				transition = $(this).attr('transition') || $(this).data('transition') || settings.defaultPageTransition;
-				if (!back) {
-					history.push({href: window.location.pathname, transition: transition});
-					var direction = $(this).attr('direction') || $(this).data('direction');
-					if (direction === 'reverse')
-						back = true;
-				}
 			}
 
 			var href = typeof to === 'string' ? to : to.url;
@@ -300,6 +312,9 @@ $(document).ready(function() {
 
 		perform : function(from, to, transition, back, changeEventData) {
 
+			changeEventData.from = from;
+			changeEventData.to = to;
+
 			from.trigger('pagebeforehide', from);
 			to.trigger('pagebeforeshow', to);
 
@@ -330,7 +345,7 @@ $(document).ready(function() {
 				from.trigger('pagehide', from);
 				to.trigger('pageshow', to);
 
-				$(this).trigger('pagechange', changeEventData);
+				$(document).trigger('pagechange', changeEventData);
 
 				$('div[data-role="page"]').hide();
 				to.show();
@@ -350,12 +365,12 @@ $(document).ready(function() {
 
 	};
 
-	$.fn.transition = function( method ) {
+	$.fn.transition = function(method) {
 
 		if (methods[method])
 		  return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
 		else if (typeof method === 'object' || !method)
-		  return methods.init.apply(this, arguments);
+		  return methods.to.apply(this, arguments);
 		else
 		  throw 'Method ' +  method + ' does not exist';
 	};
