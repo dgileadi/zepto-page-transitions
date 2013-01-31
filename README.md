@@ -106,7 +106,7 @@ This plugin shares many events with [JQuery Mobile](http://jquerymobile.com/demo
 * `pagebeforehide`: called before a page is hidden.  The data object passed as the second argument to the callback function is the page about to be hidden.  This event may not be prevented.
 * `pageshow`: called after a page is shown.  The data object passed as the second argument to the callback function is the page that was shown.  This event may not be prevented.
 * `pagehide`: called after a page is hidden.  The data object passed as the second argument to the callback function is the page that was hidden.  This event may not be prevented.
-* `pageinit`: called when a page is fully initialized, but before it is shown.  This event may not be prevented.
+* `pageinit`: called when a page is fully initialized, but before it is shown.  The data object passed as the second argument to the callback function is the page that was initialized.  This event may not be prevented.
 * `pageremove`: called before a page is removed from the DOM, which can happen when a new HTML file is loaded and the page is not being cached.  The data object passed as the second argument to the callback function is the page that will be removed.  This event may be prevented by the callback.
 
 ## Features ##

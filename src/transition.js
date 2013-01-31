@@ -148,7 +148,9 @@ $(document).ready(function() {
 			active = active || initial;
 			active.addClass('ui-page-active');
 
-			pages.trigger('pageinit');
+			pages.each(function() {
+				$(this).trigger('pageinit', $(this));
+			});
 
 			return active;
 		},
