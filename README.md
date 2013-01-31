@@ -54,11 +54,13 @@ This plugin includes the following CSS transitions, found in transition.css:
 
 You can create your own CSS transitions in your own CSS file.  Just reference them using the `transition="mycustomtransition"` or `data-transition="mycustomtransition"` attribute.
 
-## Usage ##
+## Navigation ##
 
 Any link can have a `transition` and/or `direction="reverse"` attribute (each of these can also be prefixed by `data-`).  Forms may also have these attributes.  Other elements like buttons can also trigger page transitions and have the above attributes; just add a `data-href` attribute to them.  Use the `data-rel="back"` attribute to navigate backwards using the browser history; any associated transitions will play in reverse.
 
 Any link that has a `rel="external"` attribute will be excluded from using page transitions.  Likewise any link or form that has a `data-ajax="false"` or a `target` attribute will also be excluded.
+
+You can link to HTML files that are not in the same level as the original HTML file, e.g. `href="path/with/slashes.html"`.  However this support is provided by replacing links in the loaded HTML and consequently may be slow and incomplete.  Avoid using multiple levels of pages when possible.
 
 You can load pages programmatically, as demonstrated in the programmatic example:
 
@@ -66,17 +68,23 @@ You can load pages programmatically, as demonstrated in the programmatic example
 
 The `'to'`, `transition` and `reverse` arguments are optional.
 
+## Multiple Pages In One File ##
+
 To put several pages into one HTML file simply place each one inside its own `<div data-role="page">` tag.  To link to a page within the file first give each div its own `id` attribute, and then in the link use `href="#pageid"`, where pageid is the value of a page's id attribute.  Note that page id's should be unique across your site, not just within a single HTML file.
 
-When you link to an HTML file containing multiple pages the first page is displayed.  Its `id` is also replaced by the name of the HTML file (along with any links to that id).
+When you link to an HTML file containing multiple pages the first page is displayed.  To display a page other than the first, append the id of that page as a hash in the URL you load it with.  You can see this in action by loading the multiple page example like:
+
+	multi-page.html#two
 
 When you load a new page the browser's title is replaced with that page's title.  You can use the `data-title` attribute to give pages within an HTML file their own title.
 
-You can link to HTML files that are not in the same level as the original HTML file, e.g. `href="path/with/slashes.html"`.  However this support is provided by replacing links in the loaded HTML and consequently may be slow and incomplete.  Avoid using multiple levels of pages when possible.
+## Caveats ##
 
-Because this plugin loads pages using AJAX you can't use the regular `$(document).ready()` function that you may be used to for any page except the first.  Instead bind to the `pageinit` event, which will be triggered for each loaded page.  If you want to catch the `pageinit` event for the initial page, register your listener in a script tag that comes before including transition.js.  You can see this in the events example.
+Because this plugin loads pages using AJAX you can't use the regular `$(document).ready()` function that you may be used to for any page except the first.  Instead bind to the `pageinit` event, which will be triggered for each loaded page.  If you want to handle the `pageinit` event for the initial page, register your listener in a script tag that comes before including transition.js.  You can see this in the events example.
 
-As mentioned in the example above, head content is thrown away when an HTML file is loaded.  If you want to run scripts or include styles specific to a HTML file then include them within its `<body>` tag.  Put all shared scripts and styles into the original HTML file's head content.
+As mentioned in the example, head content is thrown away when an HTML file is loaded.  If you want to run scripts or include styles specific to a HTML file then include them within its `<body>` tag.  Put all shared scripts and styles into the original HTML file's head content.
+
+## Options ##
 
 To set the `defaultPageTransition` and/or `domCache` customization options you can use code like the following:
 

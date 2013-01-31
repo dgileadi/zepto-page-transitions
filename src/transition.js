@@ -106,15 +106,20 @@ $(document).ready(function() {
 			if (eventData)
 				pages.trigger('pageload', eventData);
 
-			// the first page is special: its id must equal its hash
+			// the initial page is special: its id must equal its hash
+			var initial = pages.first();
 			if (window.location.hash) {
-				var formerId = pages.first().attr('id');
-				var id = toId(sourcePages[window.location.hash] || window.location.hash.slice(1));
-				pages.first().attr('id', id);
-				if (formerId) {
-					// fix all links that pointed to it
-					$('[data-href="#' + formerId + '"]', pages).attr('data-href', '#' + id);
-					$('[href="#' + formerId + '"]', pages).attr('href', '#' + id);
+				initial = $(window.location.hash);
+				if (!initial.length) {
+					initial = pages.first();
+					var formerId = initial.attr('id');
+					var id = toId(sourcePages[window.location.hash] || window.location.hash.slice(1));
+					initial.attr('id', id);
+					if (formerId) {
+						// fix all links that pointed to it
+						$('[data-href="#' + formerId + '"]', pages).attr('data-href', '#' + id);
+						$('[href="#' + formerId + '"]', pages).attr('href', '#' + id);
+					}
 				}
 			}
 
@@ -134,10 +139,13 @@ $(document).ready(function() {
 			if (!title)
 				title = document.title;
 			pages.not('[data-title]').data('title', title);
+			title = initial.data('title');
+			if (title)
+				document.title = title;
 
 			pages.hide();
 			var active = targetPage ? $(targetPage) : null;
-			active = active || pages.first();
+			active = active || initial;
 			active.addClass('ui-page-active');
 
 			pages.trigger('pageinit');
