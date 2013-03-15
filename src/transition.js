@@ -123,7 +123,7 @@ $(document).ready(function() {
 				}
 			}
 
-			pages.attr('style', 'position: absolute; width: 100%; height: 100%; left: 0px; top: 0px;');
+			pages.addClass('ui-page');
 			pages.each(function() {
 				if (!$(this).attr('id'))
 					$(this).attr('id', '_trans_div' + zIndex);

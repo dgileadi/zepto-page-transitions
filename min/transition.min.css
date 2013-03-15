@@ -1,3 +1,4 @@
+div.ui-page{position: absolute;width: 100%;height: 100%;left: 0px;top: 0px;}
 .spin{-webkit-transform:rotate(360deg);-webkit-animation-name:spin;-webkit-animation-duration:1s;-webkit-animation-iteration-count:infinite;-webkit-animation-timing-function:linear;-moz-transform:rotate(360deg);-moz-animation-name:spin;-moz-animation-duration:1s;-moz-animation-iteration-count:infinite;-moz-animation-timing-function:linear;}
 @-webkit-keyframes spin{from{-webkit-transform:rotate(0deg);}to{-webkit-transform:rotate(360deg);}
 }@-moz-keyframes spin{from{-moz-transform:rotate(0deg);}to{-moz-transform:rotate(360deg);}
