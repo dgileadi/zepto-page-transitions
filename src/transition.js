@@ -260,7 +260,7 @@ $(document).ready(function() {
 				if (!e.defaultPrevented) {
 					$(this).transition('load', to, eventData, function(body, result, title) {
 						// add it to the current document
-						var div = $('<div />');
+						var div = $('<div data-role="page-container" />');
 						div.html(body);
 						$(document.body).append(div);
 
@@ -368,7 +368,7 @@ $(document).ready(function() {
 						if (!e.defaultPrevented)
 							$(this).remove();
 					});
-					$('div').not('[id]').not(function() {return $(this).children().length}).remove();
+					$('div[data-role="page-container"]').not(function() {return $(this).children().length}).remove();
 				}
 			}, 707);
 		}
