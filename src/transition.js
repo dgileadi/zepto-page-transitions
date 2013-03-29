@@ -71,18 +71,20 @@ $(document).ready(function() {
 						}
 						var transition = null;
 						var back = action == null;
-						if (back)
-							transition = history.length ? history.pop().transition : settings.defaultPageTransition;
-						else if (action.transition) {
+						if (back) {
+							action = history.length ? history.pop() : null;
+							transition = action ? action.transition : settings.defaultPageTransition;
+							back = action ? !action.reverse : true;
+						} else if (action.transition) {
 							transition = action.transition;
 							history.push({href: window.location.pathname, transition: transition});
 							back = action.reverse;
 						} else {
 							transition = action.element.attr('transition') || action.element.data('transition') || settings.defaultPageTransition;
-							history.push({href: window.location.pathname, transition: transition});
 							var direction = action.element.attr('direction') || action.element.data('direction');
 							if (direction === 'reverse')
 								back = true;
+							history.push({href: window.location.pathname, transition: transition, reverse: back});
 						}
 						target.transition('changePage', to, transition, back);
 					}
