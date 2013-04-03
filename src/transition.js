@@ -334,6 +334,9 @@ $(document).ready(function() {
 				from.addClass(transition + ' out');
 				from.removeClass('ui-page-active');
 
+				var pos = to.position();
+				to.css({top: pos.top});
+
 				to.show();
 				to.addClass(transition + ' in');
 				to.addClass('ui-page-active');
@@ -349,6 +352,9 @@ $(document).ready(function() {
 				to.removeClass(transition + ' in');
 				from.removeClass('reverse');
 				to.removeClass('reverse');
+
+				to.css({top: 0});
+				window.scrollTo(0, 0);
 
 				var title = to.data('title');
 				if (title)
