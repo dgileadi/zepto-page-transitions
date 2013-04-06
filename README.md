@@ -62,6 +62,8 @@ Any link that has a `rel="external"` attribute will be excluded from using page 
 
 You can link to HTML files that are not in the same level as the original HTML file, e.g. `href="path/with/slashes.html"`.  However this support is provided by replacing links in the loaded HTML and consequently may be slow and incomplete.  Avoid using multiple levels of pages when possible.
 
+The browser's back button is supported, and plays the transition in reverse.  It also remembers the scroll location of the page you're navigating back to.  You can simulate the back button via javascript in the normal way: `history.back()`.
+
 You can load pages programmatically, as demonstrated in the programmatic example:
 
 	$(document).transition('to', relativeUrl, transition, reverse);

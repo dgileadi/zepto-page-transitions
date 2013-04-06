@@ -29,13 +29,11 @@ $(document).ready(function() {
 
 	var zIndex				= 0,
 		inited				= false,
-		baseUrl				= window.location.href.slice(0, window.location.href.lastIndexOf('/') + 1),
 		settings			= null,
-		sourcePages			= {},
-		lastLoaded			= window.location.href,
-		action				= null,
-		transition			= null,
+		pageUrls			= {},
+		lastLoadedUrl		= window.location.href,
 		ignoreHash			= {},
+		action				= null,
 		history				= [];
 
 	var methods = {
@@ -71,22 +69,25 @@ $(document).ready(function() {
 						}
 						var transition = null;
 						var back = action == null;
+						var top = 0;
 						if (back) {
 							action = history.length ? history.pop() : null;
 							transition = action ? action.transition : settings.defaultPageTransition;
 							back = action ? !action.reverse : true;
+							if (action)
+								top = action.top || 0;
 						} else if (action.transition) {
 							transition = action.transition;
-							history.push({href: window.location.pathname, transition: transition});
+							history.push({transition: transition, top: $(window).scrollTop()});
 							back = action.reverse;
 						} else {
 							transition = action.element.attr('transition') || action.element.data('transition') || settings.defaultPageTransition;
 							var direction = action.element.attr('direction') || action.element.data('direction');
 							if (direction === 'reverse')
 								back = true;
-							history.push({href: window.location.pathname, transition: transition, reverse: back});
+							history.push({transition: transition, reverse: back, top: $(window).scrollTop()});
 						}
-						target.transition('changePage', to, transition, back);
+						target.transition('changePage', to, transition, back, top);
 					}
 					action = null;
 				});
@@ -115,7 +116,7 @@ $(document).ready(function() {
 				if (!initial.length) {
 					initial = pages.first();
 					var formerId = initial.attr('id');
-					var id = toId(sourcePages[window.location.hash] || window.location.hash.slice(1));
+					var id = toId(pageUrls[window.location.hash] || window.location.hash.slice(1));
 					initial.attr('id', id);
 					if (formerId) {
 						// fix all links that pointed to it
@@ -129,7 +130,7 @@ $(document).ready(function() {
 			pages.each(function() {
 				if (!$(this).attr('id'))
 					$(this).attr('id', '_trans_div' + zIndex);
-				sourcePages['#' + $(this).attr('id')] = lastLoaded;
+				pageUrls['#' + $(this).attr('id')] = lastLoadedUrl;
 
 				$(this).css('zIndex', zIndex++);
 			});
@@ -225,7 +226,7 @@ $(document).ready(function() {
 			});
 		},
 
-		changePage : function(to, transition, back) {
+		changePage : function(to, transition, back, top) {
 
 			var changeEventData = { toPage: to, back: back };
 			var e = $.Event('pagebeforechange');
@@ -245,11 +246,11 @@ $(document).ready(function() {
 			if ((typeof to === 'string') && to.charAt(0) === '#') {
 				var toPage = $(toId(to));
 				if (toPage.length) {
-					$(this).transition('perform', from, toPage, transition, back, changeEventData);
+					$(this).transition('perform', from, toPage, transition, back, top, changeEventData);
 					handled = true;
-				} else if (!settings.domCache && sourcePages[to]) {
+				} else if (!settings.domCache && pageUrls[to]) {
 					targetPage = to;
-					to = sourcePages[to];
+					to = pageUrls[to];
 				} else
 					to = to.slice(1);
 			}
@@ -267,7 +268,7 @@ $(document).ready(function() {
 						$(document.body).append(div);
 
 						var to = $(div).transition('init', eventData, targetPage, title);
-						$(el).transition('perform', from, to, transition, back, changeEventData);
+						$(el).transition('perform', from, to, transition, back, top, changeEventData);
 					});
 					handled = true;
 				}
@@ -286,7 +287,7 @@ $(document).ready(function() {
 				eventData.xhr = xhr;
 				eventData.textStatus = textStatus;
 
-				lastLoaded = what.url;
+				lastLoadedUrl = what.url;
 
 				// mark everything not just loaded as disposable
 				if (!settings.domCache)
@@ -322,7 +323,7 @@ $(document).ready(function() {
 			$.ajax(what);
 		},
 
-		perform : function(from, to, transition, back, changeEventData) {
+		perform : function(from, to, transition, back, top, changeEventData) {
 
 			changeEventData.from = from;
 			changeEventData.to = to;
@@ -335,7 +336,7 @@ $(document).ready(function() {
 				from.removeClass('ui-page-active');
 
 				var pos = to.position();
-				to.css({top: pos.top});
+				to.css({top: pos.top - top});
 
 				to.show();
 				to.addClass(transition + ' in');
@@ -354,7 +355,7 @@ $(document).ready(function() {
 				to.removeClass('reverse');
 
 				to.css({top: 0});
-				window.scrollTo(0, 0);
+				window.scrollTo(0, top);
 
 				var title = to.data('title');
 				if (title)
