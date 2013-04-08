@@ -112,7 +112,7 @@ $(document).ready(function() {
 			// the initial page is special: its id must equal its hash
 			var initial = pages.first();
 			if (window.location.hash) {
-				initial = $(window.location.hash);
+				initial = $(toId(window.location.hash));
 				if (!initial.length) {
 					initial = pages.first();
 					var formerId = initial.attr('id');
@@ -283,6 +283,7 @@ $(document).ready(function() {
 			what = typeof what === 'string' ? {url: what, dataType: 'html', global: false} : what;
 			if (!what.url)
 				what.url = window.location.href;
+
 			what.success = function(result, textStatus, xhr) {
 				eventData.xhr = xhr;
 				eventData.textStatus = textStatus;
@@ -394,7 +395,12 @@ $(document).ready(function() {
 		  throw 'Method ' +  method + ' does not exist';
 	};
 
-	function toId(url) { return url.replace(/[:\.\+\/]/g, '_'); }
+	function toId(url) {
+		var i = url.indexOf('?');
+		if (i > 0)
+			url = url.slice(0, i);
+		return url.replace(/[:\.\+\/]/g, '_');
+	}
 
 	function fixLinks(body) {
 
