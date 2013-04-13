@@ -56,13 +56,13 @@ You can create your own CSS transitions in your own CSS file.  Just reference th
 
 ## Navigation ##
 
-Any link can have a `transition` and/or `direction="reverse"` attribute (each of these can also be prefixed by `data-`).  Forms may also have these attributes.  Other elements like buttons can also trigger page transitions and have the above attributes; just add a `data-href` attribute to them.  Use the `data-rel="back"` attribute to navigate backwards using the browser history; any associated transitions will play in reverse.
+Any link can have a `transition` and/or `direction="reverse"` attribute (each of these can also be prefixed by `data-`).  Forms may also have these attributes.  Other elements like buttons can also trigger page transitions and have the above attributes; just add a `data-href` attribute to them.
+
+Use the `data-rel="back"` attribute to navigate backwards using the browser history.  You can also use javascript, e.g. `history.back()`.  Either of these methods (or the browser's back button) will cause the previous transition to play in reverse.  The scroll location of the page you're navigating back to is also preserved.
 
 Any link that has a `rel="external"` attribute will be excluded from using page transitions.  Likewise any link or form that has a `data-ajax="false"` or a `target` attribute will also be excluded.
 
 You can link to HTML files that are not in the same level as the original HTML file, e.g. `href="path/with/slashes.html"`.  However this support is provided by replacing links in the loaded HTML and consequently may be slow and incomplete.  Avoid using multiple levels of pages when possible.
-
-The browser's back button is supported, and plays the transition in reverse.  It also remembers the scroll location of the page you're navigating back to.  You can simulate the back button via javascript in the normal way: `history.back()`.
 
 You can load pages programmatically, as demonstrated in the programmatic example:
 
