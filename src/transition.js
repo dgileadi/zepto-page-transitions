@@ -34,7 +34,8 @@ $(document).ready(function() {
 		lastLoadedUrl		= window.location.href,
 		ignoreHash			= {},
 		action				= null,
-		history				= [];
+		history				= [],
+		historyPos			= 0;
 
 	var methods = {
 
@@ -58,6 +59,9 @@ $(document).ready(function() {
 					var target = (action && action.element) || $(document.body);
 					if (!ignoreHash[window.location.hash]) {
 						var to = window.location.hash;
+						var from = $('div.ui-page-active').attr('id');
+						if (from)
+							from = '#' + from;
 						if (action && action.element && action.element.is('form')) {
 							to = {
 								type: action.element.attr('method') || 'get',
@@ -71,21 +75,27 @@ $(document).ready(function() {
 						var back = action == null;
 						var top = 0;
 						if (back) {
-							action = history.length ? history.pop() : null;
+							if (historyPos < history.length && history[historyPos].to == to)
+								action = history[historyPos++];
+							else if (historyPos > 0)
+								action = history[--historyPos];
 							transition = action ? action.transition : settings.defaultPageTransition;
 							back = action ? !action.reverse : true;
-							if (action)
+							if (action) {
 								top = action.top || 0;
+								if (!to && $(action.from).length)
+									to = action.from;
+							}
 						} else if (action.transition) {
 							transition = action.transition;
-							history.push({transition: transition, top: $(window).scrollTop()});
+							history[historyPos++] = {to: to, from: from, transition: transition, top: $(window).scrollTop()};
 							back = action.reverse;
 						} else {
 							transition = action.element.attr('transition') || action.element.data('transition') || settings.defaultPageTransition;
 							var direction = action.element.attr('direction') || action.element.data('direction');
 							if (direction === 'reverse')
 								back = true;
-							history.push({transition: transition, reverse: back, top: $(window).scrollTop()});
+							history[historyPos++] = {to: to, from: from, transition: transition, reverse: back, top: $(window).scrollTop()};
 						}
 						target.transition('changePage', to, transition, back, top);
 					}
@@ -114,6 +124,7 @@ $(document).ready(function() {
 			if (window.location.hash) {
 				initial = $(toId(window.location.hash));
 				if (!initial.length) {
+// TODO: maybe ajax-load the initial page instead?
 					initial = pages.first();
 					var formerId = initial.attr('id');
 					var id = toId(pageUrls[window.location.hash] || window.location.hash.slice(1));
