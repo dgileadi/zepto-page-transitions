@@ -75,12 +75,14 @@ $(document).ready(function() {
 						var back = action == null;
 						var top = 0;
 						if (back) {
-							if (historyPos < history.length && history[historyPos].to == to)
+							if (historyPos < history.length && history[historyPos].to == to) {
 								action = history[historyPos++];
-							else if (historyPos > 0)
+								back = false;
+							} else if (historyPos > 0) {
 								action = history[--historyPos];
+								back = action ? !action.reverse : true;
+							}
 							transition = action ? action.transition : settings.defaultPageTransition;
-							back = action ? !action.reverse : true;
 							if (action) {
 								top = action.top || 0;
 								if (!to && $(action.from).length)
