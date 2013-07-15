@@ -12,11 +12,11 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- * 
+ *
  * @author gileadis@gmail.com
  * @version 1.0.0
- * 
- * @requires 
+ *
+ * @requires
  * Zepto JavaScript Library: http://zeptojs.com
  */
 
@@ -36,6 +36,7 @@ $(document).ready(function() {
 		action				= null,
 		history				= [],
 		historyPos			= 0;
+		transitioning			= false;
 
 	var methods = {
 
@@ -58,6 +59,9 @@ $(document).ready(function() {
 				$(window).on('hashchange', function(e) {
 					var target = (action && action.element) || $(document.body);
 					if (!ignoreHash[window.location.hash]) {
+						// Beginning transition sequence. Set transitioning flag to true.
+						transitioning = true;
+
 						var to = window.location.hash;
 						var from = $('div.ui-page-active').attr('id');
 						if (from)
@@ -185,6 +189,17 @@ $(document).ready(function() {
 			return this.each(function() {
 				var el = $(this);
 
+				// Ignore all clicks and taps if the app is still transitioning
+				var transitioningHandler = function(e) {
+					if(transitioning) {
+						e.preventDefault();
+						console.log("transitioning... please wait...");
+						return false;
+					}
+				}
+				el.on('click', transitioningHandler);
+				el.on('tap', transitioningHandler);
+
 				if (el.data('rel') == 'back') {
 					var handler = function(e) {
 						window.history.back();
@@ -287,8 +302,11 @@ $(document).ready(function() {
 				}
 			}
 
-			if (!handled)
+			if (!handled) {
+				// Page change failed. Set transitioning flag to false.
+				transitioning = false;
 				$(this).trigger('pagechangefailed', changeEventData);
+			}
 		},
 
 		load : function(what, eventData, onSuccess) {
@@ -328,6 +346,8 @@ $(document).ready(function() {
 				onSuccess(body, result, title);
 			};
 			what.error = function(xhr, textStatus, errorThrown) {
+				// Page load failed. Set transitioning flag to false.
+				transitioning = false;
 				eventData.xhr = xhr;
 				eventData.textStatus = textStatus;
 				eventData.errorThrown = errorThrown;
@@ -393,6 +413,9 @@ $(document).ready(function() {
 					});
 					$('div[data-role="page-container"]').not(function() {return $(this).children().length}).remove();
 				}
+
+				// Ending transition sequence. Set transitioning flag to false.
+				transitioning = false;
 			}, 707);
 		}
 
